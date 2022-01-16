@@ -1,7 +1,12 @@
+from djoser.views import UserViewSet
 from rest_framework import viewsets
 
-from .serializers import IngredientSerializer, TagSerializer
+from .serializers import CustomUserSerializer, IngredientSerializer, TagSerializer
 from recipes.models import Ingredient, Tag
+
+
+class CustomUserViewSet(UserViewSet):
+    serializer_class = CustomUserSerializer
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
