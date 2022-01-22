@@ -1,9 +1,10 @@
 from django.contrib.auth import get_user_model
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
-from rest_framework.serializers import ModelSerializer, ReadOnlyField, ValidationError
+from rest_framework.serializers import (ModelSerializer, ReadOnlyField,
+                                        SerializerMethodField, ValidationError)
 
-from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
+from recipes.models import Favorite, Ingredient, Recipe, RecipeIngredient, Tag
 
 User = get_user_model()
 
@@ -50,12 +51,19 @@ class RecipeSerializer(ModelSerializer):
         read_only=True,
         many=True
     )
+    is_favorited = SerializerMethodField()
     image = Base64ImageField()
 
     class Meta:
         model = Recipe
-        fields = ('id', 'tags', 'author', 'ingredients', 'name',
+        fields = ('id', 'tags', 'author', 'ingredients', 'is_favorited', 'name',
                   'image', 'text', 'cooking_time')
+
+    def get_is_favorited(self, recipe):
+        user = self.context.get('request').user
+        if user.is_anonymous:
+            return False
+        return Favorite.objects.filter(user=user, recipe=recipe).exists()
 
     def validate_ingredients(self, ingredients):
         if not ingredients:
@@ -126,3 +134,11 @@ class RecipeSerializer(ModelSerializer):
         if tags:
             recipe.tags.set(tags)
         return recipe
+
+
+class RecipeMinifiedSerializer(ModelSerializer):
+    image = Base64ImageField()
+
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
