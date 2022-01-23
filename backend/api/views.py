@@ -9,7 +9,7 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from .serializers import (CustomUserSerializer, IngredientSerializer,
                           RecipeMinifiedSerializer, RecipeSerializer,
                           TagSerializer)
-from recipes.models import Favorite, Ingredient, Recipe, Tag
+from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 
 
 class CustomUserViewSet(UserViewSet):
@@ -40,6 +40,21 @@ class RecipeViewSet(ModelViewSet):
         if request.method == 'POST' and not instance.exists():
             recipe = get_object_or_404(Recipe, id=pk)
             Favorite.objects.create(user=request.user, recipe=recipe)
+            serializer = RecipeMinifiedSerializer(recipe)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        elif request.method == 'DELETE' and instance.exists():
+            instance.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post', 'delete'],
+            permission_classes=[IsAuthenticated])
+    def shopping_cart(self, request, pk=None):
+        instance = ShoppingCart.objects.filter(user=request.user, recipe__id=pk)
+        if request.method == 'POST' and not instance.exists():
+            recipe = get_object_or_404(Recipe, id=pk)
+            ShoppingCart.objects.create(user=request.user, recipe=recipe)
             serializer = RecipeMinifiedSerializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         elif request.method == 'DELETE' and instance.exists():
