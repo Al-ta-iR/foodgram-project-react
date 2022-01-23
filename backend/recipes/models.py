@@ -136,6 +136,7 @@ class Favorite(models.Model):
     )
 
     class Meta:
+        ordering = ['user', 'recipe']
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
         constraints = [
@@ -144,6 +145,9 @@ class Favorite(models.Model):
                 name='unique_favorites'
             )
         ]
+
+    def __str__(self):
+        return '{} - {}'.format(self.user, self.recipe)
 
 
 class ShoppingCart(models.Model):
