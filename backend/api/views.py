@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
+from .permissions import IsAuthor, IsReadOnly
 from .serializers import (CustomUserSerializer, IngredientSerializer,
                           RecipeMinifiedSerializer, RecipeSerializer,
                           SubscriptionSerializer, TagSerializer)
@@ -20,7 +21,13 @@ from users.models import Subscription, User
 class CustomUserViewSet(UserViewSet):
     serializer_class = CustomUserSerializer
 
-    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['get'],
+            permission_classes=[IsAuthenticated])
+    def me(self, request, *args, **kwargs):
+        return super(CustomUserViewSet, self).me(request, *args, **kwargs)
+
+    @action(detail=True, methods=['post'],
+            permission_classes=[IsAuthenticated])
     def subscribe(self, request, id=None):
         user = request.user
         author = get_object_or_404(User, id=id)
@@ -72,6 +79,7 @@ class TagViewSet(ReadOnlyModelViewSet):
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
+    permission_classes = [IsAuthor | IsReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -127,6 +135,7 @@ class RecipeViewSet(ModelViewSet):
 
 class SubscriptionListView(ListAPIView):
     serializer_class = SubscriptionSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return User.objects.filter(subscriptions__user=self.request.user)
