@@ -1,3 +1,5 @@
+from django.db.models import Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from rest_framework import status
@@ -10,7 +12,8 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from .serializers import (CustomUserSerializer, IngredientSerializer,
                           RecipeMinifiedSerializer, RecipeSerializer,
                           SubscriptionSerializer, TagSerializer)
-from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
+from recipes.models import (Favorite, Ingredient, Recipe,
+                            RecipeIngredient, ShoppingCart, Tag)
 from users.models import Subscription, User
 
 
@@ -102,6 +105,24 @@ class RecipeViewSet(ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'],
+            permission_classes=[IsAuthenticated])
+    def download_shopping_cart(self, request):
+        ingredients = RecipeIngredient.objects.filter(
+            recipe__shopping_cart__user=request.user
+        ).values(
+            'ingredient__name',
+            'ingredient__measurement_unit'
+        ).annotate(total_amount=Sum('amount'))
+        shopping_list = ['{} ({}) - {}\n'.format(
+            ingredient['ingredient__name'],
+            ingredient['ingredient__measurement_unit'],
+            ingredient['total_amount']
+        ) for ingredient in ingredients]
+        response = HttpResponse(shopping_list, content_type='text/plain')
+        response['Content-Disposition'] = 'attachment; filename="shopping_list.txt"'
+        return response
 
 
 class SubscriptionListView(ListAPIView):
