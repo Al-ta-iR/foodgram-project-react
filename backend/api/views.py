@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
+from .pagination import LimitPagination
 from .permissions import IsAuthor, IsReadOnly
 from .serializers import (CustomUserSerializer, IngredientSerializer,
                           RecipeMinifiedSerializer, RecipeSerializer,
@@ -20,6 +21,7 @@ from users.models import Subscription, User
 
 class CustomUserViewSet(UserViewSet):
     serializer_class = CustomUserSerializer
+    pagination_class = LimitPagination
 
     @action(detail=False, methods=['get'],
             permission_classes=[IsAuthenticated])
@@ -80,6 +82,7 @@ class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     permission_classes = [IsAuthor | IsReadOnly]
+    pagination_class = LimitPagination
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -136,6 +139,7 @@ class RecipeViewSet(ModelViewSet):
 class SubscriptionListView(ListAPIView):
     serializer_class = SubscriptionSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = LimitPagination
 
     def get_queryset(self):
         return User.objects.filter(subscriptions__user=self.request.user)
