@@ -4,6 +4,10 @@ from .models import (Favorite, Ingredient, Recipe,
                      RecipeIngredient, ShoppingCart, Tag)
 
 
+class IngredientAdmin(admin.ModelAdmin):
+    list_filter = ('name',)
+
+
 class RecipeIngredientInline(admin.TabularInline):
     model = Recipe.ingredients.through
     extra = 1
@@ -18,7 +22,7 @@ class RecipeAdmin(admin.ModelAdmin):
         return Favorite.objects.filter(recipe=recipe).count()
 
 
-admin.site.register(Ingredient)
+admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Tag)
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(RecipeIngredient)
