@@ -16,9 +16,10 @@ from .permissions import IsAuthor, IsReadOnly
 from .serializers import (CustomUserSerializer, IngredientSerializer,
                           RecipeMinifiedSerializer, RecipeSerializer,
                           SubscriptionSerializer, TagSerializer)
-from recipes.models import (Favorite, Ingredient, Recipe,
+
+from recipes.models import (Favorite, Ingredient, Recipe,  # isort:skip
                             RecipeIngredient, ShoppingCart, Tag)
-from users.models import Subscription, User
+from users.models import Subscription, User  # isort:skip
 
 
 class CustomUserViewSet(UserViewSet):
@@ -60,7 +61,10 @@ class CustomUserViewSet(UserViewSet):
     @subscribe.mapping.delete
     def delete_subscribe(self, request, id=None):
         author = get_object_or_404(User, id=id)
-        subscription = Subscription.objects.filter(user=request.user, author=author)
+        subscription = Subscription.objects.filter(
+            user=request.user,
+            author=author
+        )
         if subscription:
             subscription.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -111,7 +115,10 @@ class RecipeViewSet(ModelViewSet):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk=None):
-        instance = ShoppingCart.objects.filter(user=request.user, recipe__id=pk)
+        instance = ShoppingCart.objects.filter(
+            user=request.user,
+            recipe__id=pk
+        )
         if request.method == 'POST' and not instance.exists():
             recipe = get_object_or_404(Recipe, id=pk)
             ShoppingCart.objects.create(user=request.user, recipe=recipe)
@@ -138,7 +145,8 @@ class RecipeViewSet(ModelViewSet):
             ingredient['total_amount']
         ) for ingredient in ingredients]
         response = HttpResponse(shopping_list, content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename="shopping_list.txt"'
+        attachment = 'attachment; filename="shopping_list.txt"'
+        response['Content-Disposition'] = attachment
         return response
 
 

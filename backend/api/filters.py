@@ -1,4 +1,4 @@
-from django_filters import (BooleanFilter, FilterSet,
+from django_filters import (BooleanFilter, FilterSet,  # isort:skip
                             ModelChoiceFilter, ModelMultipleChoiceFilter)
 from rest_framework.filters import SearchFilter
 

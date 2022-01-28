@@ -3,15 +3,16 @@ from drf_extra_fields.fields import Base64ImageField
 from rest_framework.serializers import (ModelSerializer, ReadOnlyField,
                                         SerializerMethodField, ValidationError)
 
-from recipes.models import (Favorite, Ingredient, Recipe,
+from recipes.models import (Favorite, Ingredient, Recipe,  # isort:skip
                             RecipeIngredient, ShoppingCart, Tag)
-from users.models import Subscription, User
+from users.models import Subscription, User  # isort:skip
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'password')
+        fields = ('email', 'id', 'username', 'first_name', 'last_name',
+                  'password')
 
 
 class CustomUserSerializer(UserSerializer):
@@ -26,7 +27,10 @@ class CustomUserSerializer(UserSerializer):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return Subscription.objects.filter(user=user, author=author.id).exists()
+        return Subscription.objects.filter(
+            user=user,
+            author=author.id
+        ).exists()
 
 
 class IngredientSerializer(ModelSerializer):
@@ -66,7 +70,8 @@ class RecipeSerializer(ModelSerializer):
     class Meta:
         model = Recipe
         fields = ('id', 'tags', 'author', 'ingredients', 'is_favorited',
-                  'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time')
+                  'is_in_shopping_cart', 'name', 'image', 'text',
+                  'cooking_time')
 
     def get_is_favorited(self, recipe):
         user = self.context.get('request').user
@@ -173,7 +178,9 @@ class SubscriptionSerializer(CustomUserSerializer):
 
     def get_recipes(self, author):
         recipes = author.recipes.all()
-        recipes_limit = self.context.get('request').query_params.get('recipes_limit')
+        recipes_limit = self.context.get('request').query_params.get(
+            'recipes_limit'
+        )
         if recipes_limit:
             recipes = recipes[:int(recipes_limit)]
         return RecipeMinifiedSerializer(recipes, many=True).data
