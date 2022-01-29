@@ -109,8 +109,7 @@ class RecipeViewSet(ModelViewSet):
         elif request.method == 'DELETE' and instance.exists():
             instance.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
@@ -127,8 +126,7 @@ class RecipeViewSet(ModelViewSet):
         elif request.method == 'DELETE' and instance.exists():
             instance.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'],
             permission_classes=[IsAuthenticated])
