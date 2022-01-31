@@ -17,4 +17,4 @@ jobs:
             git clone git@github.com:Al-ta-iR/foodgram-project-react.git
             cd infra
             touch .env
-            echo Ok >> .env
+            echo Clone_Ok >> .env
