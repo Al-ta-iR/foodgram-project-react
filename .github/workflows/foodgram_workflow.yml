@@ -16,8 +16,8 @@ jobs:
           script: |
             cd foodgram-project-react/infra
             ls
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_backend:latest
-            sudo docker-compose stop
-            sudo docker-compose rm backend
-            sudo docker-compose up -d
+#            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_backend:latest
+#            sudo docker-compose stop
+#            sudo docker-compose rm backend
+#            sudo docker-compose up -d
 
