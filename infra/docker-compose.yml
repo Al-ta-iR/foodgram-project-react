@@ -16,9 +16,7 @@ services:
       - ../backend/.env
 
   backend:
-    build:
-      context: ../backend
-      dockerfile: Dockerfile
+    image: artyomoleynik/foodgram-backend:latest
     restart: always
     volumes:
       - static_value:/app/static/
@@ -26,7 +24,7 @@ services:
     depends_on:
       - db
     env_file:
-      - ../backend/.env
+      - .env
 
   frontend:
     build:
