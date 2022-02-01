@@ -11,7 +11,7 @@ class Command(BaseCommand):
     help = 'Load data from ingredients.csv to DB.'
 
     def handle(self, *args, **options):
-        data_dir = os.path.join(os.path.dirname(BASE_DIR), 'recipes', 'data')
+        data_dir = os.path.join(BASE_DIR, 'recipes', 'data')
         with open(
                 os.path.join(data_dir, 'ingredients.csv'),
                 encoding='utf-8'
