@@ -1,4 +1,4 @@
-from django_filters import (BooleanFilter, FilterSet,  # isort:skip
+from django_filters import (ChoiceFilter, FilterSet,  # isort:skip
                             ModelChoiceFilter, ModelMultipleChoiceFilter)
 from rest_framework.filters import SearchFilter
 
@@ -10,8 +10,8 @@ class IngredientSearchFilter(SearchFilter):
 
 
 class RecipeFilter(FilterSet):
-    is_favorited = BooleanFilter(method='filter_is_favorited')
-    is_in_shopping_cart = BooleanFilter(method='filter_is_in_shopping_cart')
+    is_favorited = ChoiceFilter(choices=enumerate([0, 1]), method='filter_is_favorited')
+    is_in_shopping_cart = ChoiceFilter(choices=enumerate([0, 1]), method='filter_is_in_shopping_cart')
     author = ModelChoiceFilter(queryset=User.objects.all())
     tags = ModelMultipleChoiceFilter(
         field_name='tags__slug',
@@ -24,11 +24,11 @@ class RecipeFilter(FilterSet):
         fields = ('is_favorited', 'is_in_shopping_cart', 'author', 'tags')
 
     def filter_is_favorited(self, queryset, name, value):
-        if value and not self.request.user.is_anonymous:
+        if int(value) == 1 and not self.request.user.is_anonymous:
             return queryset.filter(favorites__user=self.request.user)
         return queryset
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
-        if value and not self.request.user.is_anonymous:
+        if int(value) == 1 and not self.request.user.is_anonymous:
             return queryset.filter(shopping_cart__user=self.request.user)
         return queryset
