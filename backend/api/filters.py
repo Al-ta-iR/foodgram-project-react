@@ -10,8 +10,14 @@ class IngredientSearchFilter(SearchFilter):
 
 
 class RecipeFilter(FilterSet):
-    is_favorited = ChoiceFilter(choices=enumerate([0, 1]), method='filter_is_favorited')
-    is_in_shopping_cart = ChoiceFilter(choices=enumerate([0, 1]), method='filter_is_in_shopping_cart')
+    is_favorited = ChoiceFilter(
+        choices=enumerate([0, 1]),
+        method='filter_is_favorited'
+    )
+    is_in_shopping_cart = ChoiceFilter(
+        choices=enumerate([0, 1]),
+        method='filter_is_in_shopping_cart'
+    )
     author = ModelChoiceFilter(queryset=User.objects.all())
     tags = ModelMultipleChoiceFilter(
         field_name='tags__slug',
